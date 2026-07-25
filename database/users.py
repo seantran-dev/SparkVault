@@ -54,3 +54,30 @@ def set_username(user_id, username):
 
     cur.close()
     conn.close()
+
+def update_user(user_id, setting, value):
+    conn = get_connection() 
+    cur = conn.cursor() 
+
+    allowed = {
+         "username",
+         "email",
+         "password_hash",
+         "kdf_salt"
+    }
+    
+    if setting not in allowed:
+            raise ValueError("//SQL - Invalid setting.")
+        
+    cur.execute(
+        f"""
+        UPDATE users
+        SET {setting} = %s
+        WHERE user_id = %s;
+        """,
+        (value, user_id)
+    )
+    conn.commit()
+
+    cur.close()
+    conn.close()

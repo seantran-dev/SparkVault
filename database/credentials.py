@@ -22,8 +22,6 @@ def get_credentials(user):
     if not credentials:
         return None
 
-    
-
     return credentials
 
 def delete_credential(user, credential):
@@ -104,8 +102,6 @@ def edit_credentials(user, aes_key, credential, service, username, password):
     )
     conn.commit()
 
-    
-
     cur.close()
     conn.close()
 
@@ -114,3 +110,25 @@ def edit_credentials(user, aes_key, credential, service, username, password):
     updated_credential = credentials_list[len(credentials_list) - 1]
 
     return updated_credential
+
+def update_credential_key_change(user_id, credential_id, ciphertext, nonce):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+            """
+            UPDATE credentials
+            SET
+                ciphertext = %s, 
+                nonce = %s,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE credential_id = %s
+            AND user_id = %s
+            """,
+            (ciphertext, nonce, credential_id, user_id)
+        )
+    
+    conn.commit()
+
+    cur.close()
+    conn.close()

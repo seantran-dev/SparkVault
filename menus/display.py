@@ -419,6 +419,7 @@ def account_settings_menu(user, key):
     updated = 100
     user_id = user[0]
     username = user[1]
+    email = user[2]
 
     while True:
 
@@ -432,13 +433,13 @@ def account_settings_menu(user, key):
             updated = False
         elif updated == 1:
             print("//USER - No changes made.\n")
-        elif updated == 0: 
-            print("//DENIED - Password is incorrect.\n")
+        elif updated == -1: 
+            print("//DENIED - Passwords do not match.\n")
 
         print(f" Username:         {user[1]}")
         print(f" E-mail:           {user[2]}")
         print()
-        print(f" Account created:  {user[4].strftime('%b %d, %Y %I:%M %p')}")
+        print(f" Account created:  {user[4].strftime('%b %d, %Y')}")
         print()
         print("  1. Change Username")
         print("  2. Change E-mail")
@@ -453,9 +454,20 @@ def account_settings_menu(user, key):
         choice = input("> ").strip().lower()
         match choice:
             case "1":
-                updated, name = change_username_setting(user_id, username)
-                if name is not None:
-                    username = name
+                updated, new_username = change_username_setting(user, username)
+                if new_username is not None:
+                    username = new_username
+                continue
+            case "2":
+                updated, new_email = change_email_setting(user, email)
+                if new_email is not None:
+                    email = new_email
+                continue
+            case "3":
+                updated, new_key = change_master_password(user)
+                if new_key is not None:
+                    key = new_key
+                user = get_user(username)
                 continue
             case "b": 
                 credentials_settings_menu(user, key)

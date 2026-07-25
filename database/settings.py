@@ -3,8 +3,10 @@ from .db import get_connection
 import os
 from getpass import getpass
 from database.users import *
-from authentication.login import login
-
+from authentication.login import *
+from argon2 import PasswordHasher
+from encryption.decrypt import *
+from database.credentials import *
 
 def draw_settings_header(current_tab, user = None):
     clear_screen()
@@ -182,36 +184,6 @@ def set_auto_lock_timeout(user_id, setting, current_value):
         
     return value
 
-def change_username_setting(user_id, current_username):
-    draw_settings_header("accounts")
-    password = getpass("Enter password to continue: ")
-    user, key = login(current_username, password)
-    
-    if (user, key) == (None, None):
-        return 0, None # failed
-    username_taken = False
-    while True:
-        draw_settings_header("accounts")
-        if username_taken is True:
-            print(f"Username '{new_username}' is already in use.\n")
-            username_taken = False
-        print(f" Current Username: {current_username}\n")
-        new_username = input(f"     New Username: ")
-        if get_user(new_username) is not None:
-            username_taken = True
-            continue
-        elif new_username.strip() == "" or new_username == current_username:
-            return 1, None # cancel
-        else:
-            set_username(user_id, new_username)
-            break
-        
-    return 2, new_username # success
-
-
-
-
-    
 def set_default_sort(user_id, setting, current_value):
 
     value_error = False
@@ -258,5 +230,130 @@ def set_default_sort(user_id, setting, current_value):
             break
         
     return sort
+
+
+def change_username_setting(user, current_username):
+    draw_settings_header("accounts")
+    password = getpass("Enter password to continue: ")
+    if password == "":
+        return 1, None # cancel
+    user = authenticate(current_username, password)
+    
+    if user == None:
+        return 0, None # failed
+    username_taken = False
+    while True:
+        draw_settings_header("accounts")
+        if username_taken is True:
+            print(f"Username '{new_username}' is already in use.\n")
+            username_taken = False
+        print(f" Current Username: {current_username}\n")
+        new_username = input(f"     New Username: ")
+        if get_user(new_username) is not None:
+            username_taken = True
+            continue
+        elif new_username.strip() == "" or new_username.lower() == current_username.lower():
+            return 1, None # cancel
+        else:
+            update_user(user[0], "username", new_username)
+            break
         
+    return 2, new_username # success
+
+def change_email_setting(user, current_email):
+    draw_settings_header("accounts")
+    password = getpass("Enter password to continue: ")
+    if password == "":
+        return 1, None # cancel
+    user = authenticate(user[1], password)
+    
+    if user == None:
+        return 0, None # failed
+    while True:
+        draw_settings_header("accounts")
+        print(f" Current E-mail: {current_email}\n")
+        new_email = input(f"     New E-mail: ")
+        if new_email.strip() == "" or new_email == current_email:
+            return 1, None # cancel
+        else:
+            update_user(user[0], "email", new_email)
+            break
+        
+    return 2, new_email # success
+
+# 1. verify user's current password
+# 2. request new password
+# 3. generate new key from new password
+# 4. decrypt credential ciphertexts with current key
+# 5. encrypt ciphertexts with new key
+# 6. hash new password and update user
+
+def change_master_password(user):
+    draw_settings_header("accounts")
+    password = getpass(" Enter current password to continue: ")
+    if password == "":
+        return 1, None
+    user = authenticate(user[1], password)
+    if user == None:
+        return 0, None # failed
+
+    user, current_key = login(user[1], password)
+
+    new_password = getpass(" Enter new password: ")
+    if new_password == "":
+        return 1, None
+    confirm = getpass(" Confirm new password: ")
+    if new_password != confirm:
+        return -1, None # failed
+    
+    new_kdf_salt = os.urandom(16)
+    new_key = derive_key(new_password, new_kdf_salt)
+
+    credentials_list = get_credentials(user)
+    user_id = user[0]
+
+    ph = PasswordHasher()
+    password_hash = ph.hash(new_password)
+
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        for credential in credentials_list:
+
+            credential_password = decrypt_secret(current_key, credential)
+            password_bytes = credential_password.encode("utf-8")
+            nonce, ciphertext = encrypt_CTR(password_bytes, new_key)
+            
+            cur.execute(
+                """
+                UPDATE credentials
+                SET
+                    ciphertext = %s, 
+                    nonce = %s
+                WHERE credential_id = %s
+                AND user_id = %s
+                """,
+                (ciphertext, nonce, credential[0], user_id)
+            )
+
+        cur.execute(
+            """
+            UPDATE users
+            SET
+                password_hash = %s,
+                kdf_salt = %s
+            WHERE user_id = %s
+            """,
+            (password_hash, new_kdf_salt, user_id)
+        )
+
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        cur.close()
+        conn.close()
+
+    return 2, new_key
 
