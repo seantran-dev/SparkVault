@@ -9,7 +9,7 @@ def get_credentials(user):
 
     user_id = user[0]
     cur.execute("""
-        SELECT credential_id, user_id, service, login_username, ciphertext, nonce, created_at, updated_at
+        SELECT credential_id, user_id, service, login_username, ciphertext, nonce, created_at, updated_at, website
         FROM credentials
         WHERE user_id = %s
     """, (user_id,))

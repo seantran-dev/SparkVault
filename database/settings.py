@@ -357,3 +357,38 @@ def change_master_password(user):
 
     return 2, new_key
 
+def terminate_account(user):
+    value_error = False
+    user_id = user[0]
+    draw_settings_header("accounts")
+    password = getpass(" Enter password to continue: ")
+    if password == "":
+        return 1 # cancel
+    user = authenticate(user[1], password)
+    
+    if user == None:
+        return 0 # failed
+    
+    while True:
+        draw_settings_header("accounts")
+
+        print(" Warning: You are about to delete your account along with all credentials and data associated with it. ")
+        print("          Would you like to continue?\n")
+
+        if value_error is True:
+            print(" Please enter a valid option.\n")
+            value_error = False
+
+        print("  1. Yes")
+        print("  2. No")
+        print()
+        choice = input("> ")
+        if choice == "1":
+            delete_user(user_id)
+            return 2
+        elif choice == "2" or choice == "":
+            return 1
+        else: 
+            value_error = True
+            continue
+    

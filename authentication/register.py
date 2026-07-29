@@ -18,3 +18,5 @@ def register(username, email, password):
         password_hash,
         kdf_salt
     )
+
+    create_user

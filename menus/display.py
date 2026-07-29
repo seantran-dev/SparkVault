@@ -1,4 +1,4 @@
-
+# I wish this file was cleaner, I really do.
 import os
 import pyperclip
 from getpass import getpass
@@ -88,17 +88,21 @@ def exit_program(fast_exit = False):
 
 
 def main_menu(fail_status = None, cancelled_registration = None, short = None):
+    while breadcrumb:
+        breadcrumb.pop()
     breadcrumb.append("Password Vault")
     clear_screen()
     draw_header(None)
     if fail_status is True and cancelled_registration is None:
         print("//ERROR - Invalid username or password.\n")
-    elif cancelled_registration is True:
+    elif cancelled_registration is True and cancelled_registration is not None:
         print("//USER - Registration cancelled.\n")
     elif cancelled_registration is False and short is False:
         print("Registration successful, please log-in.\n")
-    elif short is True:
+    elif short is True and fail_status is not True:
         print("//ERROR - All input must be 4 characters minimum.\n")
+    elif fail_status is True and cancelled_registration is True and short is True:
+        print(" Account successfully deleted.\n")
     
     while True:
         print("  1. Log-in")
@@ -433,6 +437,8 @@ def account_settings_menu(user, key):
             updated = False
         elif updated == 1:
             print("//USER - No changes made.\n")
+        elif updated == 0: 
+            print("//DENIED - Password is incorrect.\n")
         elif updated == -1: 
             print("//DENIED - Passwords do not match.\n")
 
@@ -468,6 +474,12 @@ def account_settings_menu(user, key):
                 if new_key is not None:
                     key = new_key
                 user = get_user(username)
+                continue
+            case "4":
+                updated = terminate_account(user)
+                if updated == 2:
+                    main_menu(True, True, True)
+                    break
                 continue
             case "b": 
                 credentials_settings_menu(user, key)
@@ -520,19 +532,19 @@ def sort_credentials(credentials_list, sort_by):
         credentials_list.sort(key=lambda x: x[2].lower())
         sort_title = "Service (A-Z)"
     elif sort_by == "created_at":
-        credentials_list.sort(key=lambda x: x[6])
+        credentials_list.sort(key=lambda x: x[6], reverse = True)
         sort_title = "Created at (Newest)"
     elif sort_by == "updated_at":
-        credentials_list.sort(key=lambda x: x[7])
+        credentials_list.sort(key=lambda x: x[7], reverse = True)
         sort_title = "Updated at (Newest)"
     elif sort_by == "service (inversed)":
         credentials_list.sort(key=lambda x: x[2].lower(), reverse = True)
         sort_title = "Service (Z-A)"
     elif sort_by == "created_at (inversed)":
-        credentials_list.sort(key=lambda x: x[6], reverse = True)
+        credentials_list.sort(key=lambda x: x[6])
         sort_title = "Created at (Oldest)"
     elif sort_by == "updated_at (inversed)":
-        credentials_list.sort(key=lambda x: x[7], reverse = True)
+        credentials_list.sort(key=lambda x: x[7])
         sort_title = "Updated at (Oldest)"
 
     return credentials_list, sort_title
@@ -643,6 +655,7 @@ def add_credentials_menu(user, key):
     settings = load_user_settings(user[0])
     service = input(" Service: ")
     if service.strip() == "":
+        back(2)
         login_options(user, key, login_success = False, no_credentials_stored = False, add_success = False)
     
     login_username = input(" Username: ")

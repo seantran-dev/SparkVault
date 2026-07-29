@@ -8,8 +8,19 @@ def create_user(username, email, password_hash, salt):
         """
         INSERT INTO users (username, email, password_hash, kdf_salt)
         VALUES (%s, %s, %s, %s)
+        RETURNING user_id;
         """,
         (username, email, password_hash, salt)    
+    )
+
+    user_id = cur.fetchone()[0]
+
+    cur.execute(
+         """
+         INSERT INTO user_settings (user_id)
+         VALUES (%s);
+         """,
+         (user_id,)
     )
 
     conn.commit()
@@ -61,9 +72,7 @@ def update_user(user_id, setting, value):
 
     allowed = {
          "username",
-         "email",
-         "password_hash",
-         "kdf_salt"
+         "email"
     }
     
     if setting not in allowed:
@@ -81,3 +90,21 @@ def update_user(user_id, setting, value):
 
     cur.close()
     conn.close()
+
+def delete_user(user_id):
+    conn = get_connection() 
+    cur = conn.cursor() 
+
+    cur.execute(
+         f"""
+         DELETE FROM users
+         WHERE user_id = %s;
+         """,
+         (user_id,)
+    )
+
+    conn.commit()
+    
+    cur.close()
+    conn.close()
+    
