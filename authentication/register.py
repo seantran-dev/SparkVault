@@ -19,4 +19,3 @@ def register(username, email, password):
         kdf_salt
     )
 
-    create_user

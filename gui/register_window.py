@@ -8,11 +8,12 @@ from PySide6.QtWidgets import (
 
 from gui.widgets import CyberButton, LinkLabel
 from gui.theme import *
-
+from authentication.register import register
+from database.users import *
 
 class CreateAccountPage(QWidget):
 
-    account_created = Signal(object, object)
+    account_created = Signal()
     back_requested = Signal()
 
     def __init__(self):
@@ -71,7 +72,10 @@ class CreateAccountPage(QWidget):
         
 
         self.create_button.clicked.connect(self.create_account)
-
+        self.username.returnPressed.connect(self.create_account)
+        self.password.returnPressed.connect(self.create_account)
+        self.confirm.returnPressed.connect(self.create_account)
+        
         layout = QVBoxLayout(self)
         layout.setContentsMargins(150, 80, 150, 80)
         layout.setSpacing(18)
@@ -106,14 +110,24 @@ class CreateAccountPage(QWidget):
         if not password:
             self.status.setText("Please enter a master password.")
             return
+        
+        self.status.setStyleSheet(f"""
+            color: #FF5252;
+        """)
 
         if password != confirm:
             self.status.setText("Passwords do not match.")
             return
 
-        #
-        # Backend call goes here.
-        #
+        if get_user(username) is not None:
+            self.status.setText("Username is already taken.")
+            return
+        
+        register(username, "", password)
+
+        self.account_created.emit()
+        
+        
 
     def reset(self):
 

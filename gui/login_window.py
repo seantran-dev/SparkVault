@@ -71,6 +71,9 @@ class LoginPage(QWidget):
         self.login_button = CyberButton("Unlock Vault")
         self.status = SubtitleLabel("")
         self.status.setAlignment(Qt.AlignCenter)
+        self.status.setStyleSheet(f"""
+            color: {ACCENT};
+        """)
 
         
 
@@ -82,7 +85,7 @@ class LoginPage(QWidget):
             'Don\'t have an account? <a href="#">Create Account</a>'
         )
         self.create_account.clicked.connect(self.show_create_account.emit)
-
+        
         layout.addWidget(self.login_button)
         layout.addWidget(self.status)
 
@@ -156,7 +159,7 @@ class LoginPage(QWidget):
         self.login_button.setEnabled(False)
         self.login_button.setText("Unlocking...")
 
-        self.status.setText("Decrypting encrypted vault...")
+        self.status.setText("Decrypting vault...")
 
         self.user = user
         self.key = key

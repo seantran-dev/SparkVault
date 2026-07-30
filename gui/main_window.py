@@ -51,6 +51,7 @@ class MainWindow(QMainWindow):
         self.create_account_page.back_requested.connect(
             lambda: self.transition(self.create_account_page, self.login_page, 1)
         )
+        self.create_account_page.account_created.connect(self.on_account_created)
 
         self.stack.addWidget(self.login_page)
         self.stack.setCurrentWidget(self.login_page)
@@ -200,3 +201,14 @@ class MainWindow(QMainWindow):
 
         self.transition_group.finished.connect(cleanup)
         self.transition_group.start()
+
+    def on_account_created(self):
+        self.login_page.reset()
+        self.login_page.status.setStyleSheet(f"color: {ACCENT};")
+        self.login_page.status.setText("Account created successfully!")
+
+        self.transition(
+            self.create_account_page,
+            self.login_page,
+            1
+        )

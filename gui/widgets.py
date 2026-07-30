@@ -3,13 +3,15 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QLabel,
     QFrame,
-    QLineEdit
+    QLineEdit,
+    QToolButton
 )
 
-from PySide6.QtCore import Qt, QRect, Signal
+from PySide6.QtCore import Qt, QRect, Signal, QSize
 from PySide6.QtGui import QPainter, QColor
 
 from gui.theme import *
+import qtawesome as qta
 
 
 class CyberButton(QPushButton):
@@ -33,11 +35,11 @@ class CyberButton(QPushButton):
             }}
 
             QPushButton:hover {{
-                background:#4DFF94;
+                background-color:#00E676;
             }}
 
             QPushButton:pressed {{
-                background:#00B84A;
+                background-color: #00A63C;
             }}
         """)
 
@@ -53,15 +55,22 @@ class CyberButton(QPushButton):
         rect = self.rect()
 
         # Background
+        # Background
         painter.setPen(Qt.PenStyle.NoPen)
 
         if self.progress == 0:
-            painter.setBrush(QColor(ACCENT))
+            if self.isDown():
+                color = QColor("#00C348")      # Pressed
+            elif self.underMouse():
+                color = QColor("#00FF66")      # Hover
+            else:
+                color = QColor(ACCENT)         # Normal
+
+            painter.setBrush(color)
         else:
             painter.setBrush(QColor(PANEL_LIGHT))
 
         painter.drawRoundedRect(rect, RADIUS, RADIUS)
-
         # Progress fill
         if self.progress > 0:
 
@@ -97,6 +106,85 @@ class CyberButton(QPushButton):
             self.text()
         )
 
+class ToolbarButton(QPushButton):
+
+    def __init__(self, text="", icon=None, primary=False):
+        super().__init__(text)
+
+        self.setFont(BODY_FONT)
+        self.setCursor(Qt.PointingHandCursor)
+        self.setFixedSize(110, 42)
+
+        self.icon = icon
+
+        if primary:
+            self.normal_color = QColor(PRIMARY)
+            self.hover_color = QColor(PRIMARY_HOVER)
+            self.pressed_color = QColor(PRIMARY_PRESSED)
+            self.text_color = QColor(BACKGROUND)
+            self.border_color = QColor(PRIMARY)
+        else:
+            self.normal_color = QColor(TOOLBAR)
+            self.hover_color = QColor(TOOLBAR_HOVER)
+            self.pressed_color = QColor(TOOLBAR_PRESSED)
+            self.text_color = QColor(TEXT)
+            self.border_color = QColor(BORDER)
+
+    def paintEvent(self, event):
+
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        rect = self.rect()
+
+        # Background
+        painter.setPen(Qt.PenStyle.NoPen)
+
+        if self.isDown():
+            color = self.pressed_color
+        elif self.underMouse():
+            color = self.hover_color
+        else:
+            color = self.normal_color
+
+        painter.setBrush(color)
+        painter.drawRoundedRect(rect, RADIUS, RADIUS)
+
+        # Border
+        painter.setPen(self.border_color)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        painter.drawRoundedRect(
+            rect.adjusted(0, 0, -1, -1),
+            RADIUS,
+            RADIUS
+        )
+
+        # Icon
+        if self.icon:
+            icon_rect = QRect(12, 0, 18, rect.height())
+            self.icon.paint(
+                painter,
+                icon_rect,
+                Qt.AlignmentFlag.AlignCenter
+            )
+
+        # Text
+        painter.setPen(self.text_color)
+        painter.setFont(self.font())
+
+        if self.icon:
+            text_rect = rect.adjusted(36, 0, 0, 0)
+            alignment = Qt.AlignVCenter | Qt.AlignLeft
+        else:
+            text_rect = rect
+            alignment = Qt.AlignCenter
+
+        painter.drawText(
+            text_rect,
+            alignment,
+            self.text()
+        )
+
 class CyberTextBox(QLineEdit):
 
     def __init__(self, placeholder="", password=False):
@@ -115,12 +203,55 @@ class CyberTextBox(QLineEdit):
                 border-radius:{RADIUS}px;
                 color:{TEXT};
                 padding:10px;
+                padding-right:40px;
             }}
 
             QLineEdit:focus {{
                 border:2px solid {ACCENT};
             }}
         """)
+
+
+
+
+class SearchBox(CyberTextBox):
+
+    def __init__(self, placeholder=""):
+        super().__init__(placeholder)
+
+        # Leave room for the sort button
+        self.setStyleSheet(self.styleSheet() + """
+            QLineEdit {
+                padding-right: 42px;
+            }
+        """)
+
+        self.sort_button = QToolButton(self)
+        self.sort_button.setIcon(qta.icon("fa6s.sort", color=TEXT_DIM))
+        self.sort_button.setIconSize(QSize(28, 28))
+        self.sort_button.setCursor(Qt.PointingHandCursor)
+        self.sort_button.setFixedSize(32, 32)
+
+        self.sort_button.setStyleSheet(f"""
+            QToolButton {{
+                border: none;
+                background: transparent;
+            }}
+
+            QToolButton:hover {{
+                background: {PANEL_LIGHT};
+                border-radius: 6px;
+            }}
+        """)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+
+        margin = 8
+        self.sort_button.move(
+            self.width() - self.sort_button.width() - margin,
+            (self.height() - self.sort_button.height()) // 2
+        )
 
 class DimLabel(QLabel):
 

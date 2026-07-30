@@ -4,16 +4,21 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QScrollArea,
     QLabel,
-    QPushButton
+    QPushButton,
+    QDialog,
+    QToolButton
 )
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QAbstractAnimation, Signal
+from PySide6.QtGui import QAction
 
 from gui.widgets import *
 from gui.theme import *
 from gui.credential_card import CredentialCard, Credential
 from gui.credential_dialog import CredentialDialog
-from database.credentials import *
+from gui.widgets import ToolbarButton
+from gui.credential_editor_dialog import CredentialEditorDialog
 
+from database.credentials import *
 import qtawesome as qta
 
 
@@ -27,7 +32,6 @@ class DashboardPage(QWidget):
 
         self.setWindowTitle("SecureDB")
         self.resize(WINDOW_WIDTH, WINDOW_HEIGHT)
-
         self.setStyleSheet(f"""
             QWidget {{
                 background:{BACKGROUND};
@@ -83,11 +87,26 @@ class DashboardPage(QWidget):
 
         toolbar_layout = QHBoxLayout()
 
-        self.search_box = CyberTextBox("Search credentials...")
-        self.add_button = CyberButton("+ Add Credential")
+        # Search bar
+        self.search_box = SearchBox("Search credentials...")
+        #self.sort_button.clicked.connect(self.show_sort_menu)
+
+
+        # Add new credential
+        self.add_button = ToolbarButton("Add", None, primary=True)
+
+
+        #self.search_box.addAction(sort_action, QLineEdit.TrailingPosition)
+
+
+
+        self.add_button.setFixedWidth(TOOLBAR_ADD_BUTTON_WIDTH)
+        self.add_button.setFixedHeight(TOOLBAR_ADD_BUTTON_HEIGHT)
 
         toolbar_layout.addWidget(self.search_box)
         toolbar_layout.addWidget(self.add_button)
+        
+        self.add_button.clicked.connect(self.add_credential)
 
         # Scroll Function and Smoothening
         self.scroll_area = SmoothScrollArea()
@@ -95,7 +114,6 @@ class DashboardPage(QWidget):
         self.scroll_area.setFrameShape(QScrollArea.NoFrame)
         self.scroll_area.verticalScrollBar().setStyleSheet(SCROLLBAR_STYLE)
         
-
         self.container = QWidget()
 
         self.credentials_layout = QVBoxLayout(self.container)
@@ -104,33 +122,75 @@ class DashboardPage(QWidget):
 
         self.scroll_area.setWidget(self.container)
 
-        credentials = get_credentials(self.user)
-
-        cards = []
-        for row in credentials:
-            credential = Credential(
-                service = row[2], # service
-                username = row[3], # username
-                ciphertext = row[4], # ciphertext
-                nonce = row[5], # once
-                created_at = row[6], # created at datetime
-                updated_at = row[7], # updated at datetime
-                website = row[8], # website
-            )
-            card = CredentialCard(credential, key)
-            cards.append(card)
-        
-        for card in cards:
-            self.credentials_layout.insertWidget(
-                self.credentials_layout.count() - 1,
-                card
-            )
+        self.refresh_credentials()
 
         main_layout.addLayout(header_layout)
         main_layout.addLayout(toolbar_layout)
         main_layout.addWidget(self.scroll_area)
 
-        
+    def refresh_credentials(self):
+
+        # Remove all existing cards
+        while self.credentials_layout.count() > 1:
+            item = self.credentials_layout.takeAt(0)
+
+            if item.widget():
+                item.widget().deleteLater()
+
+        credentials = get_credentials(self.user)
+
+        if not credentials:
+            empty = SubtitleLabel('Click "Add Credential" to store your first password.')
+            empty.setAlignment(Qt.AlignCenter)
+            self.credentials_layout.insertWidget(
+                self.credentials_layout.count() - 1,
+                empty
+            )
+            return
+
+        for row in credentials:
+            credential = Credential(
+                service=row[2],
+                username=row[3],
+                ciphertext=row[4],
+                nonce=row[5],
+                created_at=row[6],
+                updated_at=row[7],
+                website=row[8]
+            )
+
+            card = CredentialCard(credential, self.key)
+
+            self.credentials_layout.insertWidget(
+                self.credentials_layout.count() - 1,
+                card
+            )
+
+    def add_credential(self):
+
+        dialog = CredentialEditorDialog()
+
+        if dialog.exec():
+
+            service = dialog.service.text().strip()
+            username = dialog.username.text().strip()
+            password = dialog.password.text()
+            website = dialog.website.text().strip()
+
+            print(service)
+            print(username)
+            print(password)
+            print(website)
+
+            add_credentials(
+                self.user,
+                dialog.service.text().strip(),
+                dialog.username.text().strip(),
+                dialog.password.text(),
+                self.key
+            )
+
+            self.refresh_credentials()
 
     def logout(self):
         from gui.login_window import LoginWindow
