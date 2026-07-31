@@ -1,4 +1,4 @@
-# SecureDB Password Manager
+# SparkVault Encrypted Password Manager
 
 ## Overview
 A command-line password manager written in Python that securely stores credentials using PostgreSQL and a custom implementation of AES-256 in CTR mode, originally written by me in Java, and now ported to Python years later.
