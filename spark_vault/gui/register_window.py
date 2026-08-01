@@ -75,7 +75,13 @@ class CreateAccountPage(QWidget):
         self.username.returnPressed.connect(self.create_account)
         self.password.returnPressed.connect(self.create_account)
         self.confirm.returnPressed.connect(self.create_account)
-        
+
+        self.username.textChanged.connect(self.clear_status)
+        self.password.textChanged.connect(self.clear_status)
+        self.confirm.textChanged.connect(self.clear_status)
+
+        self.username.editingFinished.connect(self.check_username)
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(150, 80, 150, 80)
         layout.setSpacing(18)
@@ -97,6 +103,20 @@ class CreateAccountPage(QWidget):
 
         layout.addStretch()
 
+    def check_username(self):
+        username = self.username.text().strip()
+
+        if not username:
+            self.status.clear()
+            return
+
+        if get_user(username) is not None:
+            self.status.setStyleSheet(f"color: {ERROR};")
+            self.status.setText("Username is already taken.")
+        else:
+            self.status.setStyleSheet(f"color: {ACCENT};")
+            self.status.setText("Username is available.")
+
     def create_account(self):
 
         username = self.username.text().strip()
@@ -106,28 +126,33 @@ class CreateAccountPage(QWidget):
         if not username:
             self.status.setText("Please enter a username.")
             return
-
-        if not password:
-            self.status.setText("Please enter a master password.")
+        elif get_user(username) is not None:
+            self.status.setStyleSheet(f"""color: {ERROR};""")
+            self.status.setText("Username is already taken.")
             return
         
-        self.status.setStyleSheet(f"""
-            color: #FF5252;
-        """)
-
+        if not password:
+            self.status.setStyleSheet(f"""color: {ACCENT};""")
+            self.status.setText("Please enter a password.")
+            return
+        elif not confirm:
+            self.status.setStyleSheet(f"""color: {ACCENT};""")
+            self.status.setText("Please confirm your password.")
+            return
         if password != confirm:
+            self.status.setStyleSheet(f"""color: {ERROR};""")
             self.status.setText("Passwords do not match.")
             return
 
-        if get_user(username) is not None:
-            self.status.setText("Username is already taken.")
-            return
+        
         
         register(username, "", password)
 
         self.account_created.emit()
         
-        
+            
+    def clear_status(self):
+        self.status.clear()
 
     def reset(self):
 

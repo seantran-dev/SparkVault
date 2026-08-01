@@ -11,12 +11,11 @@ from gui.main_window import MainWindow
 
 def main():
 
-    
-
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("assets/icon.ico"))
-    load_fonts()
+    app.setWindowIcon(QIcon("gui/assets/spark.ico"))
     
+    load_fonts()
+
     window = MainWindow()
     window.show()
 

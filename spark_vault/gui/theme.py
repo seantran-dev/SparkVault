@@ -23,7 +23,7 @@ def load_fonts():
 TITLE_FONT = QFont("Blender Pro", 26)
 HEADING_FONT = QFont("Blender Pro", 22)
 BODY_FONT = QFont("Blender Pro", 18)
-BUTTON_FONT = QFont("Blender Pro", 14)
+BUTTON_FONT = QFont("Blender Pro", 16)
 
 LABEL_FONT = QFont("Blender Pro", 14)
 SMALL_FONT = QFont("Blender Pro", 12)
@@ -40,8 +40,9 @@ PANEL = "#1A1A1A"
 PANEL_LIGHT = "#252525"
 
 # ACCENT = "#00FF66"
+#ACCENT = "#C9A227" #yellowih gold
 ACCENT = "#00E676"
-
+ERROR =  "#FF5252"
 
 # Toolbar Buttons
 

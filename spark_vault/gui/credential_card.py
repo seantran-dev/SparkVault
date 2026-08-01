@@ -1,11 +1,15 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout
 
 from gui.theme import *
 from gui.credential_dialog import CredentialDialog
+
+
 class Credential:
     def __init__(
         self,
+        credential_id,
+        user_id,
         service,
         username,
         ciphertext,
@@ -14,6 +18,8 @@ class Credential:
         updated_at,
         website
     ):
+        self.credential_id = credential_id
+        self.user_id = user_id
         self.service = service
         self.username = username
         self.ciphertext = ciphertext
@@ -23,9 +29,12 @@ class Credential:
         self.website = website
 
 class CredentialCard(QFrame):
-
-    def __init__(self, credential, key):
+    delete_requested = Signal(int)
+    edit_requested = Signal()
+    def __init__(self, user, credential, key):
+        
         super().__init__()
+        self.user = user
         self.credential = credential
         self.key = key
         self.setFixedHeight(110)
@@ -85,5 +94,13 @@ class CredentialCard(QFrame):
         layout.addWidget(self.updated_label)
 
     def mousePressEvent(self, event):
-        dialog = CredentialDialog(self.credential, self.key)
-        dialog.exec()
+        dialog = CredentialDialog(self.user, self.credential, self.key)
+
+        if dialog.exec():
+            if dialog.delete_requested:
+                self.delete_requested.emit(self.credential.credential_id)
+            elif dialog.edit_requested:
+                self.edit_requested.emit()
+
+
+        

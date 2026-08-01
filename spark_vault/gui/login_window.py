@@ -32,7 +32,7 @@ class LoginPage(QWidget):
         layout.setSpacing(18)
         layout.addStretch()
         layout.addWidget(
-            TitleLabel("SecureDB")
+            TitleLabel("SparkVault")
         )
 
         layout.addWidget(
@@ -62,6 +62,9 @@ class LoginPage(QWidget):
 
         self.password = CyberTextBox("Password")
         self.password.setEchoMode(QLineEdit.EchoMode.Password)
+
+        self.username.textChanged.connect(self.clear_status)
+        self.password.textChanged.connect(self.clear_status)
 
         layout.addWidget(self.username)
         layout.addWidget(self.password)
@@ -117,6 +120,10 @@ class LoginPage(QWidget):
 
         layout.addStretch()
 
+
+    def clear_status(self):
+        self.status.clear()
+
     def handle_login(self):
 
         username = self.username.text().strip()
@@ -125,11 +132,8 @@ class LoginPage(QWidget):
         user, key = login(username, password)
 
         if user is None:
-            QMessageBox.warning(
-                self,
-                "Login Failed",
-                "Invalid username or password."
-            )
+            self.status.setStyleSheet(f"""color: {ERROR};""")
+            self.status.setText("Invalid username or password.")
             return
 
         self.login_success(user, key)
@@ -158,8 +162,10 @@ class LoginPage(QWidget):
 
         self.login_button.setEnabled(False)
         self.login_button.setText("Unlocking...")
-
-        self.status.setText("Decrypting vault...")
+        self.status.setStyleSheet(f"""
+                    color: {ACCENT};
+                """)
+        self.status.setText("Validated. Decrypting vault...")
 
         self.user = user
         self.key = key

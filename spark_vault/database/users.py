@@ -1,5 +1,6 @@
 from .db import get_connection
 
+
 def create_user(username, email, password_hash, salt):
     conn = get_connection() # opening phone call
     cur = conn.cursor() # conversation
@@ -107,4 +108,57 @@ def delete_user(user_id):
     
     cur.close()
     conn.close()
+
+
+def update_username(user, current_password, new_username):
+    from authentication.login import authenticate
+
+    if get_user(new_username) is not None:
+        return False, "Username is already taken."
+
+    username = user[1]
+
+    if new_username == username:
+        return False, "Username is unchanged."
+    user = authenticate(username, current_password)
+
+    if user is None:
+        return False, "Incorrect password."
     
+    user_id = user[0]
+
+    conn = get_connection() 
+    cur = conn.cursor() 
+
+    cur.execute(
+        """
+        UPDATE users
+        SET username = %s
+        WHERE user_id = %s
+        """,
+        (new_username, user_id)    
+    )
+
+    conn.commit()
+    
+    cur.close()
+    conn.close()
+
+    return True, ""
+
+
+def update_user_password(user, current_key, current_password, new_password):
+    from authentication.login import authenticate
+    from database.credentials import get_credentials, re_encrypt_credentials
+    from argon2 import PasswordHasher
+    
+    new_key = current_key
+    username = user[1]
+    user = authenticate(username, current_password)
+    if user is None: 
+        return False, "Incorrect password.", user, current_key
+
+
+    new_user, new_key = re_encrypt_credentials(user, current_key, new_password)
+
+    return True, "Password updated.", new_user, new_key

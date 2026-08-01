@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
             }}
         """)
 
-        self.setWindowTitle("SecureDB")
+        self.setWindowTitle("SparkVault")
         self.resize(WINDOW_WIDTH, WINDOW_HEIGHT)
 
         self.stack = QStackedWidget()

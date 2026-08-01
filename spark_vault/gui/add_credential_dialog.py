@@ -9,7 +9,7 @@ from gui.widgets import *
 from gui.theme import *
 
 
-class CredentialEditorDialog(QDialog):
+class AddCredentialDialog(QDialog):
 
     def __init__(self, credential=None):
         super().__init__()
@@ -36,12 +36,12 @@ class CredentialEditorDialog(QDialog):
             if credential is None
             else "Edit Credential"
         )
-
-        self.service = CyberTextBox("Service")
+    
+        self.service = CyberTextBox("Service (Required)")
         self.username = CyberTextBox("Username")
         self.password = CyberTextBox("Password")
         self.password.setEchoMode(QLineEdit.Password)
-        self.website = CyberTextBox("Website (Optional)")
+        self.website = CyberTextBox("Website")
 
         # If editing, pre-fill the fields
         if credential is not None:
@@ -60,10 +60,22 @@ class CredentialEditorDialog(QDialog):
             if credential is None
             else "Save Changes"
         )
+        self.status_label = QLabel("")
+        self.status_label.setFont(BODY_FONT)
+        self.status_label.setStyleSheet(f"""
+            color: {ERROR};
+            font-size: 16pt;
+        """)
+        
+        button_layout = QHBoxLayout()
+
 
         self.cancel_button.clicked.connect(self.reject)
-        self.save_button.clicked.connect(self.accept)
+        self.save_button.clicked.connect(self.save)
+        self.service.textChanged.connect(self.clear_status)
+        
 
+        button_layout.addWidget(self.status_label)
         button_layout.addStretch()
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.save_button)
@@ -75,3 +87,13 @@ class CredentialEditorDialog(QDialog):
         main_layout.addWidget(self.website)
         main_layout.addStretch()
         main_layout.addLayout(button_layout)
+
+    def save(self):
+        if not self.service.text().strip():
+            self.status_label.setText("Service is required.")
+            return
+
+        self.accept()
+
+    def clear_status(self):
+        self.status_label.clear()

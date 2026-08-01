@@ -16,8 +16,20 @@ import qtawesome as qta
 
 class CyberButton(QPushButton):
 
-    def __init__(self, text):
+    def __init__(self, text, primary=True):
         super().__init__(text)
+
+        if primary:
+            background = ACCENT
+            hover = "#00E676"
+            pressed = "#00A63C"
+            text_color = "black"
+        else:
+            background = PANEL_LIGHT
+            hover = PANEL_LIGHT
+            pressed = PANEL
+            text_color = TEXT
+
         self.progress = 0
         self.animating = False
 
@@ -26,21 +38,22 @@ class CyberButton(QPushButton):
 
         self.setStyleSheet(f"""
             QPushButton {{
-                background:{ACCENT};
-                color:black;
-                border:none;
-                outline: none;
-                border-radius:{RADIUS}px;
-                padding:12px;
-            }}
+            background-color: {background};
+            color: {text_color};
+            border: 2px solid {BORDER};
+            border-radius: {RADIUS}px;
+            padding: 12px;
+        }}
 
-            QPushButton:hover {{
-                background-color:#00E676;
-            }}
+        QPushButton:hover {{
+            background-color: {hover};
+            border: 2px solid {ACCENT};
+        }}
 
-            QPushButton:pressed {{
-                background-color: #00A63C;
-            }}
+        QPushButton:pressed {{
+            background-color: {pressed};
+            border: 2px solid {ACCENT};
+        }}
         """)
 
     def set_progress(self, value):
@@ -106,6 +119,63 @@ class CyberButton(QPushButton):
             self.text()
         )
 
+class SecondaryButton(QPushButton):
+
+    def __init__(self, text):
+        super().__init__(text)
+
+        self.setFont(BUTTON_FONT)
+        self.setCursor(Qt.PointingHandCursor)
+
+        self.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {PANEL_LIGHT};
+                color: {TEXT};
+                border: 2px solid {BORDER};
+                border-radius: {RADIUS}px;
+                padding: 12px;
+            }}
+
+            QPushButton:hover {{
+                border: 2px solid {ACCENT};
+            }}
+
+            QPushButton:pressed {{
+                background-color: {PANEL};
+                border: 2px solid {ACCENT};
+            }}
+        """)
+
+class DangerButton(QPushButton):
+
+    def __init__(self, text):
+        super().__init__(text)
+
+        self.setFont(BUTTON_FONT)
+        self.setCursor(Qt.PointingHandCursor)
+
+        self.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {PANEL_LIGHT};
+                color: {TEXT};
+                border: 2px solid {BORDER};
+                border-radius: {RADIUS}px;
+                padding: 12px;
+            }}
+
+            QPushButton:hover {{
+                background-color: #8B1E1E;
+                border: 2px solid #E53935;
+                color: white;
+            }}
+
+            QPushButton:pressed {{
+                background-color: #6D1515;
+                border: 2px solid #E53935;
+                color: white;
+            }}
+        """)
+        
 class ToolbarButton(QPushButton):
 
     def __init__(self, text="", icon=None, primary=False):

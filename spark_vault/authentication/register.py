@@ -11,11 +11,12 @@ def register(username, email, password):
     ph = PasswordHasher()
     password_hash = ph.hash(password)
     kdf_salt = os.urandom(16)
-
+    
     create_user(
         username, 
         email,
         password_hash,
         kdf_salt
     )
+
 
