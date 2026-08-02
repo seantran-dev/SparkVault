@@ -5,8 +5,6 @@ A desktop password manager written in Python that securely stores credentials us
 
 I created this project to learn the principles behind security for secure credential storage and to better understand the software responsible for protecting my own sensitive information.
 
-https://github.com/user-attachments/assets/5d350a82-082c-4daf-bed5-080db0db75af
-
 ## Features
  - PySide6 modern desktop interface
  - User registration and authentication with Argon2 password hashing
