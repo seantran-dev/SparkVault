@@ -1,10 +1,11 @@
-import psycopg
+import sqlite3
+
+DATABASE = "sparkvault.db"
 
 def get_connection():
-    return psycopg.connect(
-        host="localhost",
-        port=5432,
-        dbname="secure_db",
-        user="sean",
-        password="sparky"
-    )
+    conn = sqlite3.connect(DATABASE)
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+

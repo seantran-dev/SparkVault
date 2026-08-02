@@ -2,7 +2,7 @@
 
 from argon2 import PasswordHasher
 import os
-from database.users import create_user, get_user
+from spark_vault.database.users import create_user, get_user
 from getpass import getpass
 
 

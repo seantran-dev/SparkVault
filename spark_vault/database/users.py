@@ -8,18 +8,17 @@ def create_user(username, email, password_hash, salt):
     cur.execute(
         """
         INSERT INTO users (username, email, password_hash, kdf_salt)
-        VALUES (%s, %s, %s, %s)
-        RETURNING user_id;
+        VALUES (?, ?, ?, ?)
         """,
         (username, email, password_hash, salt)    
     )
 
-    user_id = cur.fetchone()[0]
+    user_id = cur.lastrowid
 
     cur.execute(
          """
          INSERT INTO user_settings (user_id)
-         VALUES (%s);
+         VALUES (?);
          """,
          (user_id,)
     )
@@ -37,7 +36,7 @@ def get_user(username):
         """
         SELECT *
         FROM users
-        WHERE username = %s
+        WHERE username = ?
         """,
         (username,)
     )
@@ -56,8 +55,8 @@ def set_username(user_id, username):
     cur.execute(
         """
         UPDATE users
-        SET username = %s
-        WHERE user_id = %s
+        SET username = ?
+        WHERE user_id = ?
         """,
         (username, user_id)    
     )
@@ -82,8 +81,8 @@ def update_user(user_id, setting, value):
     cur.execute(
         f"""
         UPDATE users
-        SET {setting} = %s
-        WHERE user_id = %s;
+        SET {setting} = ?
+        WHERE user_id = ?;
         """,
         (value, user_id)
     )
@@ -99,7 +98,7 @@ def delete_user(user_id):
     cur.execute(
          f"""
          DELETE FROM users
-         WHERE user_id = %s;
+         WHERE user_id = ?;
          """,
          (user_id,)
     )
@@ -111,7 +110,7 @@ def delete_user(user_id):
 
 
 def update_username(user, current_password, new_username):
-    from authentication.login import authenticate
+    from spark_vault.authentication.login import authenticate
 
     if get_user(new_username) is not None:
         return False, "Username is already taken."
@@ -133,8 +132,8 @@ def update_username(user, current_password, new_username):
     cur.execute(
         """
         UPDATE users
-        SET username = %s
-        WHERE user_id = %s
+        SET username = ?
+        WHERE user_id = ?
         """,
         (new_username, user_id)    
     )
@@ -148,8 +147,8 @@ def update_username(user, current_password, new_username):
 
 
 def update_user_password(user, current_key, current_password, new_password):
-    from authentication.login import authenticate
-    from database.credentials import get_credentials, re_encrypt_credentials
+    from spark_vault.authentication.login import authenticate
+    from spark_vault.database.credentials import get_credentials, re_encrypt_credentials
     from argon2 import PasswordHasher
     
     new_key = current_key

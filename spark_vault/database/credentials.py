@@ -1,8 +1,9 @@
 from .db import get_connection
 from getpass import getpass
-from encryption.modes import encrypt_CTR, decrypt_CTR
 from datetime import datetime
 from argon2 import PasswordHasher
+
+from spark_vault.encryption.modes import encrypt_CTR, decrypt_CTR
 
 import os
 
@@ -14,7 +15,7 @@ def get_credentials(user):
     cur.execute("""
         SELECT credential_id, user_id, service, login_username, ciphertext, nonce, created_at, updated_at, website
         FROM credentials
-        WHERE user_id = %s
+        WHERE user_id = ?
     """, (user_id,))
 
     credentials = cur.fetchall()
@@ -33,8 +34,8 @@ def delete_credential(user_id, cred_id):
 
     cur.execute("""
         DELETE FROM credentials
-        WHERE credential_id = %s
-        AND user_id = %s
+        WHERE credential_id = ?
+        AND user_id = ?
     """, (cred_id, user_id))
 
     conn.commit()
@@ -54,7 +55,7 @@ def add_credentials(user, service, login_username, password, website, aes_key):
     cur.execute(
         """
         INSERT INTO credentials (user_id, service, login_username, ciphertext, nonce, website)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
         (user_id, service, login_username, ciphertext, nonce, website)    
     )
@@ -77,14 +78,14 @@ def edit_credentials(user, aes_key, cred_id, service, username, password, websit
         """
         UPDATE credentials
         SET
-            service = %s,
-            login_username = %s,
-            ciphertext = %s, 
-            nonce = %s,
-            website = %s,
+            service = ?,
+            login_username = ?,
+            ciphertext = ?, 
+            nonce = ?,
+            website = ?,
             updated_at = CURRENT_TIMESTAMP
-        WHERE credential_id = %s
-        AND user_id = %s
+        WHERE credential_id = ?
+        AND user_id = ?
         """,
         (service, username, ciphertext, nonce, website, cred_id, user_id)
     )
@@ -102,11 +103,11 @@ def update_credential_key_change(user_id, credential_id, ciphertext, nonce):
             """
             UPDATE credentials
             SET
-                ciphertext = %s, 
-                nonce = %s,
+                ciphertext = ?, 
+                nonce = ?,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE credential_id = %s
-            AND user_id = %s
+            WHERE credential_id = ?
+            AND user_id = ?
             """,
             (ciphertext, nonce, credential_id, user_id)
         )
@@ -117,9 +118,10 @@ def update_credential_key_change(user_id, credential_id, ciphertext, nonce):
     conn.close()
 
 def re_encrypt_credentials(user, current_key, new_password):
-    from authentication.login import derive_key
-    from encryption.decrypt import decrypt_secret
-    from encryption.modes import encrypt_CTR
+    from spark_vault.authentication.login import derive_key
+    from spark_vault.encryption.decrypt import decrypt_secret
+    from spark_vault.encryption.modes import encrypt_CTR
+    from spark_vault.database.users import get_user
 
     ph = PasswordHasher()
     password_hash = ph.hash(new_password)
@@ -144,10 +146,10 @@ def re_encrypt_credentials(user, current_key, new_password):
                 """
                 UPDATE credentials
                 SET
-                    ciphertext = %s, 
-                    nonce = %s
-                WHERE credential_id = %s
-                AND user_id = %s
+                    ciphertext = ?, 
+                    nonce = ?
+                WHERE credential_id = ?
+                AND user_id = ?
                 """,
                 (ciphertext, nonce, credential[0], user_id)
             )
@@ -156,9 +158,9 @@ def re_encrypt_credentials(user, current_key, new_password):
             """
             UPDATE users
             SET
-                password_hash = %s,
-                kdf_salt = %s
-            WHERE user_id = %s
+                password_hash = ?,
+                kdf_salt = ?
+            WHERE user_id = ?
             """,
             (password_hash, new_kdf_salt, user_id)
         )
@@ -170,6 +172,7 @@ def re_encrypt_credentials(user, current_key, new_password):
     finally:
         cur.close()
         conn.close()
+
     new_user = get_user(username)
     
     return new_user, new_key

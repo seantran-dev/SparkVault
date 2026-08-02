@@ -4,8 +4,8 @@
 from argon2 import PasswordHasher
 import hashlib
 from getpass import getpass
-from database.users import get_user
-from database.credentials import get_credentials
+from spark_vault.database.users import get_user
+from spark_vault.database.credentials import get_credentials
 
 
 ph = PasswordHasher()

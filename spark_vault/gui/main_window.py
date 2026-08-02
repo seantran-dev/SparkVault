@@ -9,10 +9,10 @@ from PySide6.QtCore import (
     QPropertyAnimation,
     QPoint,
 )
-from gui.login_window import LoginPage
-from gui.dashboard_window import DashboardPage
-from gui.theme import *
-from gui.register_window import CreateAccountPage
+from spark_vault.gui.login_window import LoginPage
+from spark_vault.gui.dashboard_window import DashboardPage
+from spark_vault.gui.theme import *
+from spark_vault.gui.register_window import CreateAccountPage
 
 
 class MainWindow(QMainWindow):

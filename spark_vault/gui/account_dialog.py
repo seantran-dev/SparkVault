@@ -14,9 +14,9 @@ from PySide6.QtGui import QKeyEvent
 from PySide6.QtCore import Qt
 import qtawesome as qta
 
-from gui.theme import *
-from gui.widgets import *
-from database.users import update_username, get_user, update_user_password
+from spark_vault.gui.theme import *
+from spark_vault.gui.widgets import *
+from spark_vault.database.users import update_username, get_user, update_user_password
 
 class AccountDialog(QDialog):
 
@@ -38,7 +38,7 @@ class AccountDialog(QDialog):
     def setup_window(self):
 
         self.setWindowTitle("Account")
-        self.resize(500, 600)
+        self.resize(600, 500)
 
         self.setStyleSheet(f"""
             QDialog {{
@@ -137,7 +137,14 @@ class AccountDialog(QDialog):
         button_layout.addStretch()
         self.close_button = SecondaryButton("Close")
         self.close_button.clicked.connect(self.reject)
-        
+        self.close_button.setDefault(True)
+        self.close_button.setAutoDefault(True)
+        self.edit_username_button.setDefault(False)
+        self.edit_username_button.setAutoDefault(False)
+        self.edit_password_button.setDefault(False)
+        self.edit_password_button.setAutoDefault(False)
+
+
         button_layout.addWidget(self.close_button)
 
         
@@ -267,7 +274,6 @@ class AccountDialog(QDialog):
 
 
     def save_password(self):
-        print("save_password called")
         current_password = self.current_password_box.text()
         new_password = self.new_password_box.text()
         confirm_password = self.password_confirm_box.text()

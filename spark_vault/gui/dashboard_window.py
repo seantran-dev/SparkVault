@@ -12,18 +12,19 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QAbstractAnimation, Signal
 from PySide6.QtGui import QAction
 
-from gui.widgets import *
-from gui.theme import *
-from gui.credential_card import CredentialCard, Credential
-from gui.credential_dialog import CredentialDialog
-from gui.widgets import ToolbarButton
-from gui.add_credential_dialog import AddCredentialDialog
-from database.settings import *
-from database.credentials import delete_credential as db_delete_credential
-from gui.account_dialog import AccountDialog
+from spark_vault.gui.widgets import *
+from spark_vault.gui.theme import *
+from spark_vault.gui.credential_card import CredentialCard, Credential
+from spark_vault.gui.credential_dialog import CredentialDialog
+from spark_vault.gui.widgets import ToolbarButton
+from spark_vault.gui.add_credential_dialog import AddCredentialDialog
+from spark_vault.database.settings import *
+from spark_vault.database.credentials import delete_credential as db_delete_credential
+from spark_vault.gui.account_dialog import AccountDialog
+
 import qtawesome as qta
 
-from database.settings import *
+from spark_vault.database.settings import *
 
 
 class DashboardPage(QWidget):
@@ -255,8 +256,8 @@ class DashboardPage(QWidget):
                 username=row[3],
                 ciphertext=row[4],
                 nonce=row[5],
-                created_at=row[6],
-                updated_at=row[7],
+                created_at=datetime.fromisoformat(row[6]),
+                updated_at=datetime.fromisoformat(row[7]),
                 website=row[8]
             )
 

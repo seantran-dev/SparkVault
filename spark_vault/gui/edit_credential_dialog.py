@@ -5,9 +5,9 @@ from PySide6.QtWidgets import (
     QLineEdit,
 )
 
-from gui.widgets import *
-from gui.theme import *
-from encryption.decrypt import decrypt_password
+from spark_vault.gui.widgets import *
+from spark_vault.gui.theme import *
+from spark_vault.encryption.decrypt import decrypt_password
 
 
 class EditCredentialDialog(QDialog):
@@ -82,7 +82,12 @@ class EditCredentialDialog(QDialog):
         self.cancel_button.clicked.connect(self.reject)
         self.save_button.clicked.connect(self.save)
         self.service.textChanged.connect(self.clear_status)
+        
+        self.save_button.setDefault(True)
+        self.save_button.setAutoDefault(True)
 
+        self.cancel_button.setDefault(False)
+        self.cancel_button.setAutoDefault(False)
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.status_label)
         button_layout.addStretch()

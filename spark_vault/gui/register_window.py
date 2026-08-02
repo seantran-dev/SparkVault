@@ -6,10 +6,10 @@ from PySide6.QtWidgets import (
     QLineEdit,
 )
 
-from gui.widgets import CyberButton, LinkLabel
-from gui.theme import *
-from authentication.register import register
-from database.users import *
+from spark_vault.gui.widgets import CyberButton, LinkLabel
+from spark_vault.gui.theme import *
+from spark_vault.authentication.register import register
+from spark_vault.database.users import *
 
 class CreateAccountPage(QWidget):
 

@@ -10,9 +10,9 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Qt, Signal, QTimer, QPropertyAnimation
-from gui.theme import *
-from gui.widgets import *
-from authentication.login import *
+from spark_vault.gui.theme import *
+from spark_vault.gui.widgets import *
+from spark_vault.authentication.login import *
 import sys
 
 

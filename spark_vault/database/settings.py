@@ -2,11 +2,11 @@
 from .db import get_connection
 import os
 from getpass import getpass
-from database.users import *
-from authentication.login import *
+from spark_vault.database.users import *
+from spark_vault.authentication.login import *
 from argon2 import PasswordHasher
-from encryption.decrypt import *
-from database.credentials import *
+from spark_vault.encryption.decrypt import *
+from spark_vault.database.credentials import *
 
 def draw_settings_header(current_tab, user = None):
     clear_screen()
@@ -40,7 +40,7 @@ def load_user_settings(user_id):
     cur.execute(
         """
         SELECT * FROM user_settings
-        WHERE user_id = %s;
+        WHERE user_id = ?;
         """,
         (user_id,)
     )
@@ -70,8 +70,8 @@ def update_setting(user_id, setting, value):
         cur.execute(
             f"""
             UPDATE user_settings
-            SET {setting} = %s
-            WHERE user_id = %s;
+            SET {setting} = ?
+            WHERE user_id = ?;
             """,
             (value, user_id)
         )
@@ -328,10 +328,10 @@ def change_master_password(user):
                 """
                 UPDATE credentials
                 SET
-                    ciphertext = %s, 
-                    nonce = %s
-                WHERE credential_id = %s
-                AND user_id = %s
+                    ciphertext = ?, 
+                    nonce = ?
+                WHERE credential_id = ?
+                AND user_id = ?
                 """,
                 (ciphertext, nonce, credential[0], user_id)
             )
@@ -340,9 +340,9 @@ def change_master_password(user):
             """
             UPDATE users
             SET
-                password_hash = %s,
-                kdf_salt = %s
-            WHERE user_id = %s
+                password_hash = ?,
+                kdf_salt = ?
+            WHERE user_id = ?
             """,
             (password_hash, new_kdf_salt, user_id)
         )

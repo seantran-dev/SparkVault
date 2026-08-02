@@ -1,5 +1,16 @@
+build/
+dist/
 __pycache__/
 *.py[cod]
 .venv/
 venv/
 .env
+
+# SQLite databases
+*.db
+
+# SQLite journal files
+*.db-journal
+*.db-wal
+*.db-shm
+

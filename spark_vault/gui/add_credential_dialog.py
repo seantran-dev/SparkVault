@@ -5,8 +5,8 @@ from PySide6.QtWidgets import (
     QLineEdit,
 )
 
-from gui.widgets import *
-from gui.theme import *
+from spark_vault.gui.widgets import *
+from spark_vault.gui.theme import *
 
 
 class AddCredentialDialog(QDialog):
@@ -66,7 +66,12 @@ class AddCredentialDialog(QDialog):
             color: {ERROR};
             font-size: 16pt;
         """)
-        
+        self.save_button.setDefault(True)
+        self.save_button.setAutoDefault(True)
+
+        self.cancel_button.setDefault(False)
+        self.cancel_button.setAutoDefault(False)
+
         button_layout = QHBoxLayout()
 
 

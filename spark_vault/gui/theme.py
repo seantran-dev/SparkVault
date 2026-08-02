@@ -7,8 +7,9 @@ RADIUS = 10
 
 from pathlib import Path
 from PySide6.QtGui import QFont, QFontDatabase
+from spark_vault.database.initialize import resource_path
 
-FONT_DIR = Path(__file__).parent / "fonts"
+FONT_DIR = resource_path("spark_vault/gui/fonts")
 
 def load_fonts():
     font_id = QFontDatabase.addApplicationFont(

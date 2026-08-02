@@ -1,8 +1,8 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout
 
-from gui.theme import *
-from gui.widgets import *
+from spark_vault.gui.theme import *
+from spark_vault.gui.widgets import *
 
 
 class DeleteConfirmationDialog(QDialog):

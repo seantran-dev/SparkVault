@@ -8,13 +8,13 @@ from PySide6.QtWidgets import (
     QMenu
 )
 from PySide6.QtCore import Qt
-from gui.theme import *
-from encryption.decrypt import *
-from gui.widgets import *
+from spark_vault.gui.theme import *
+from spark_vault.encryption.decrypt import *
+from spark_vault.gui.widgets import *
 import qtawesome as qta
-from gui.delete_confirmation_dialog import DeleteConfirmationDialog
-from gui.edit_credential_dialog import EditCredentialDialog
-from database.credentials import edit_credentials
+from spark_vault.gui.delete_confirmation_dialog import DeleteConfirmationDialog
+from spark_vault.gui.edit_credential_dialog import EditCredentialDialog
+from spark_vault.database.credentials import edit_credentials
 
 class CredentialDialog(QDialog):
     

@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QRect, Signal, QSize
 from PySide6.QtGui import QPainter, QColor
 
-from gui.theme import *
+from spark_vault.gui.theme import *
 import qtawesome as qta
 
 

@@ -1,9 +1,10 @@
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout
 
-from gui.theme import *
-from gui.credential_dialog import CredentialDialog
+from spark_vault.gui.theme import *
+from spark_vault.gui.credential_dialog import CredentialDialog
 
+from datetime import datetime
 
 class Credential:
     def __init__(
