@@ -1,5 +1,6 @@
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QUrl
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout
+from PySide6.QtGui import QDesktopServices
 
 from spark_vault.gui.theme import *
 from spark_vault.gui.credential_dialog import CredentialDialog
@@ -77,7 +78,7 @@ class CredentialCard(QFrame):
         self.website_label.setFont(BODY_FONT)
         self.website_label.setStyleSheet(f"color: {TEXT_DIM};")
 
-
+        
         # Last Updated
         self.updated_label = QLabel(f"Updated {self.credential.updated_at.strftime('%b %d, %Y')}")
         self.updated_label.setFont(LABEL_FONT)

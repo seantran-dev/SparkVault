@@ -7,7 +7,8 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QMenu
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QDesktopServices
 from spark_vault.gui.theme import *
 from spark_vault.encryption.decrypt import *
 from spark_vault.gui.widgets import *
@@ -73,11 +74,24 @@ class CredentialDialog(QDialog):
         website_heading.setFont(LABEL_FONT)
         website_heading.setStyleSheet(f"color: {TEXT_DIM};")
 
-        website = QLabel(self.credential.website)
-        website.setFont(BODY_FONT)
-        
+        website_row = QHBoxLayout()
+        website_row.setSpacing(10)
+
+        self.website_label = QLabel(self.credential.website)
+        self.website_label.setFont(BODY_FONT)
+
+        self.website_button = QPushButton("")
+        self.website_button.setIcon(qta.icon("fa6s.globe"))
+        self.website_button.setFixedSize(32, 32)
+        self.website_button.setFocusPolicy(Qt.NoFocus)
+        self.website_button.clicked.connect(self.open_website)
+
+        website_row.addWidget(self.website_label)
+        website_row.addStretch()
+        website_row.addWidget(self.website_button)
+
         website_layout.addWidget(website_heading)
-        website_layout.addWidget(website)
+        website_layout.addLayout(website_row)
 
         # Username
 
@@ -163,6 +177,17 @@ class CredentialDialog(QDialog):
         
 
         main_layout.addLayout(button_layout)
+
+    def open_website(self):
+        url = self.credential.website.strip()
+
+        if not url:
+            return
+
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
+
+        QDesktopServices.openUrl(QUrl(url))
 
     def toggle_password(self):
         if self.password_visible:
