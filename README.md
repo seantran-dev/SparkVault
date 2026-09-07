@@ -40,19 +40,8 @@ I created this project to learn the principles behind security for secure creden
  - Docker
  - Cryptography (AES, Argon2, PBKDF2)
 
-## Installation
-1. Clone the repository
-2. Install dependencies
-3. Start PostgreSQL
-4. Run the application
-
-
-## Project Structure
-
-authentication/
-database/
-encryption/
-menus/
+## Installation/Download
+[⬇️ Download SparkVault for Windows](https://github.com/seantran-dev/SparkVault/releases/latest/download/SparkVault.exe)
 
 ## Security Notes
 - Master passwords are hashed using Argon2 before storage.
