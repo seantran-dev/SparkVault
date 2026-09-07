@@ -1,4 +1,4 @@
-# SparkVault Encrypted Password Manager
+# SparkVault: Encrypted Password Manager
 
 ## Overview
 A desktop password manager written in Python that securely stores credentials using SQLite and a custom implementation of AES-256 in CTR mode, originally written by me in Java, and now ported to Python years later. This application features a modern desktop interface and is distributed as a standalone windows executable.
@@ -13,6 +13,27 @@ I created this project to learn the principles behind security for secure creden
  - Encrypted passwords are stored as ciphertext and nonce pairs in database
  - Dockerized PostgreSQL database for persistent data storage
 
+<table>
+ <tr>
+  
+  <td align="center">
+   <img width="300" height="297" alt="login" src="https://github.com/user-attachments/assets/c1bc499d-e1d8-4562-aac6-6be8edd24f1d" />
+   <b>User Authentication</b><br>
+  </td>
+    
+  <td align="center">
+   <img width="300" height="296" alt="delete" src="https://github.com/user-attachments/assets/f6f600d9-5715-4b8e-91f0-6ccfe4e0813c" />
+   <b>Delete Existing Credential</b><br>
+  </td>
+
+  <td align="center">
+   <img width="300" height="295" alt="add" src="https://github.com/user-attachments/assets/9a96af26-48c5-485b-be22-12c7aa34b013" />
+   <b>Add New Credential</b><br>
+  </td>
+  
+ </tr>
+</table>
+
 ## Technologies
  - Python (psycopg --> SQLite3)
  - PostgreSQL --> SQLite
@@ -25,9 +46,6 @@ I created this project to learn the principles behind security for secure creden
 3. Start PostgreSQL
 4. Run the application
 
-## Usage
-
-https://github.com/user-attachments/assets/433c1f30-6680-450f-9ab2-005f4309f524
 
 ## Project Structure
 
