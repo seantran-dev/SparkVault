@@ -27,6 +27,8 @@ I created this project to learn the principles behind security for secure creden
 
 ## Usage
 
+https://github.com/user-attachments/assets/433c1f30-6680-450f-9ab2-005f4309f524
+
 ## Project Structure
 
 authentication/
